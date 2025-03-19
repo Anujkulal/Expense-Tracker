@@ -58,9 +58,6 @@ The **Advanced Expense Tracker** is a full-stack web application built using the
 ## Contributing
 Contributions are welcome! Feel free to fork the repository and submit pull requests.
 
-## License
-This project is licensed under the MIT License.
-
 ## Contact
 For any queries, contact: 
 
