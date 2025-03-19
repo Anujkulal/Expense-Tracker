@@ -12,6 +12,7 @@ import { MdDelete } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaCommentDots } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Expense() {
   const [expenseData, setexpenseData] = useState({
@@ -31,7 +32,10 @@ export default function Expense() {
     error,
     setError,
     totalExpense,
+    isAuth,
   } = useGlobalContext();
+
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setexpenseData({ ...expenseData, [e.target.name]: e.target.value });
@@ -51,7 +55,13 @@ export default function Expense() {
     deleteExpense(id);
   };
 
+  console.log("authorized:::", isAuth)
+
+  
   useEffect(() => {
+    // if(!isAuth){
+    //   navigate("/signin")
+    // }
     getExpense();
   }, []);
 

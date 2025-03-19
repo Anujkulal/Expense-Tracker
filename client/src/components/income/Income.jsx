@@ -12,6 +12,7 @@ import { MdDelete } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaCommentDots } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Income() {
   // const [incomes, setIncomes] = useState([]);
@@ -21,6 +22,7 @@ export default function Income() {
     date: "",
     category: "Salary",
     description: "",
+
   });
 
   const {
@@ -32,7 +34,10 @@ export default function Income() {
     error,
     setError,
     totalIncome,
+    isAuth,
   } = useGlobalContext();
+
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setIncomeData({ ...incomeData, [e.target.name]: e.target.value });
@@ -53,7 +58,13 @@ export default function Income() {
     deleteIncome(id);
   };
 
+  console.log("authorized:::", isAuth)
+
+  
   useEffect(() => {
+    // if(!isAuth){
+    //   navigate("/signin")
+    // }
     getIncome();
   }, []);
 

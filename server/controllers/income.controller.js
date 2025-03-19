@@ -7,7 +7,8 @@ exports.addIncome = async (req, res) => {
         amount,
         category,
         description,
-        date
+        date,
+        createdBy: req.user.id,
     })
     
     try{
@@ -27,8 +28,12 @@ exports.addIncome = async (req, res) => {
 
 exports.getIncome = async (req, res) => {
     try{ 
-        const incomes = await Income.find().sort({createdAt: -1});
-        // console.log(incomes)
+        if(!req.user || !req.user.id){
+            console.log("Unauthorized access")
+           return res.status(400).json({message: "Unauthorized access"});
+        } 
+        const incomes = await Income.find({ createdBy: req.user.id }).sort({createdAt: -1});
+        console.log("on getincome:::",req.user)
         if(!incomes || incomes.length === 0){
             return res.status(404).json({error: "No income found"})
         }

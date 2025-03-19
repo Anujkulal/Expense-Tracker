@@ -2,7 +2,10 @@ const express = require('express');
 const cookieParser = require("cookie-parser")
 const cors = require("cors");
 const { mongoDBConnection } = require('./connection');
-const transactionRoute = require("./routes/transaction.routes")
+
+const userRouter = require('./routes/user.routes');
+const transactionRoute = require("./routes/transaction.routes");
+const { checkAuth } = require('./middlewares/checkAuth');
 
 const app = express();
 const PORT = 3000;
@@ -18,7 +21,11 @@ app.use(cors({
     credentials: true
 }));
 
+//middleware
+app.use(checkAuth("token"));
+
 //routes
+app.use("/auth/user", userRouter);
 app.use('/api/v1', transactionRoute);
 
 // app.get("/", (req, res) => {

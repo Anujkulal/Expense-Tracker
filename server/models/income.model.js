@@ -33,6 +33,10 @@ const IncomeSchema = new Schema({
         trim: true,
         maxLength: 50,
     },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    }
 }, { timestamps: true });
 
 const Income = model('Income', IncomeSchema);

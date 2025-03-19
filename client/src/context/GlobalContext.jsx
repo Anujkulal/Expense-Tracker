@@ -3,64 +3,71 @@ import { useState, createContext, useContext, useEffect } from 'react';
 // import Cookies from 'js-cookie';
 
 const server_transaction_url = 'http://localhost:3000/api/v1';
-const server_user_url = 'http://localhost:3000/user/auth';
+const server_user_url = 'http://localhost:3000/auth/user';
 
 axios.defaults.withCredentials = true;
 
 export const GlobalContext = createContext();
 
 export const GlobalContextProvider = (props) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState([]);
     const [income, setIncome] = useState([]);
     const [expense, setExpense] = useState([]);
     const [error, setError] = useState(null);
     const [tokenVal, setTokenVal] = useState(null);
-    const [authMessage, setAuthMessage] = useState(null);
-    const [myuser, setMyUser] = useState(null);
+    const [authMessage, setAuthMessage] = useState(null)
+    const [authError, setAuthError] = useState(null);
+    const [isAuth, setIsAuth] = useState(true);
 
     //signup user
     const signUp = async (user) => {
         // console.log("User Data Being Sent:", user); 
         try{
-            const response = await axios.post(`${server_user_url}/signup`, user);
-            console.log("response:::",response.data);
+            const response = await axios.post(`${server_user_url}/signup`, user, {withCredentials: true});
+            console.log("signup response:::",response.data);
             setAuthMessage(response.data.message);
+            setAuthError(null);
             // setUser(user);
         } catch(error){
             console.log(error.response?.data?.message);
             setError(error.response?.data?.message);
+            setAuthError(error.response?.data?.message);
         }
     }
 
     const signIn = async (user) => {
         try{
             const response = await axios.post(`${server_user_url}/signin`, user, {withCredentials: true});
+            const userResponse = await axios.get(`${server_user_url}/getuser`, {withCredentials: true});
             console.log("signin response:::",response.data);
+            console.log("user response:::",userResponse.data);
             if(!response) {
                 console.log("Invalid credentials", error.response?.data?.message);
                 return setError("Invalid credentials");
             }
-        //     const token = Cookies.get("token");
-        // if (token) {
-        //   setMyUser({ token });
-        // }
-        // console.log("Token:::", token);
+    
             console.log("signin data from context:::",response.data.message);
             setAuthMessage(response.data.message);
-            setUser(response.data.user);
+            setUser(userResponse.data.user);
             setTokenVal(response.data.token);
+
+            localStorage.setItem("user", JSON.stringify(userResponse.data.user));
+
         } catch(error){
-            console.log("eerror",error.response?.data?.message);
+            console.log("error in context:::",error.response?.data?.message);
             setError(error.response?.data?.message);
+            setAuthError(error.response?.data?.message)
         }
     }
 
-    const logout = async () => {  // No need to pass `user`
+    const signout = async () => {  // No need to pass `user`
         try {
-            const response = await axios.post(`${server_user_url}/logout`, {}, { withCredentials: true }); // Send an empty object
+            const response = await axios.post(`${server_user_url}/signout`, {}, { withCredentials: true }); // Send an empty object
             console.log("logout:::", response.data);
             setAuthMessage(response.data.message);
-            setUser(null);
+            setUser([]);
+
+            localStorage.removeItem("user");
         } catch (error) {
             console.log(error.response?.data?.message);
             setError(error.response?.data?.message || "Logout failed");
@@ -70,13 +77,16 @@ export const GlobalContextProvider = (props) => {
 
     const getIncome = async () => {
         try {
+            setIsAuth(true)
             const response = await axios.get(`${server_transaction_url}/get-income`)
-            // console.log("getIncome response:::", response);
+            console.log("getIncome response:::", response);
 
             if(!response || !response.data || response.data.length === 0){
                 console.log("Failed to fetch incomes");
                 return setError(err.response?.data?.error || "Failed to fetch incomes");
             }
+
+            // if(response)
 
             // console.log("error response:::", error);
             setIncome(response.data);
@@ -85,7 +95,8 @@ export const GlobalContextProvider = (props) => {
 
         } catch (err) {
             setError(err.response?.data?.message || "Income Not Found!");
-            console.log("error response:::", error);
+            setIsAuth(false)
+            console.log("error response:::", err.response?.data?.message);
             setIncome([]);
         }
     };
@@ -112,6 +123,7 @@ export const GlobalContextProvider = (props) => {
 
     const getExpense = async () => {
         try {
+            setIsAuth(true)
             const response = await axios.get(`${server_transaction_url}/get-expense`);
             // console.log("getExpense response:::", response);
 
@@ -126,6 +138,7 @@ export const GlobalContextProvider = (props) => {
         } catch (err) {
             setError(err.response?.data?.message || "Expense Not Found!");
             console.log("error response:::", error);
+            setIsAuth(false)
             setExpense([]);
         }
     };
@@ -171,7 +184,7 @@ export const GlobalContextProvider = (props) => {
             setError,
             signUp,
             signIn,
-            logout,
+            signout,
             getIncome,
             addIncome,
             deleteIncome,
@@ -182,7 +195,12 @@ export const GlobalContextProvider = (props) => {
             totalExpense,
             transactionHistory,
             authMessage,
+            setAuthMessage,
             tokenVal,
+            authError,
+            setAuthError,
+            isAuth,
+            setIsAuth
         }}>
             {props.children}
         </GlobalContext.Provider>

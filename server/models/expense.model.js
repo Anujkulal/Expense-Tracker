@@ -33,6 +33,10 @@ const ExpenseSchema = new Schema({
         trim: true,
         maxLength: 50,
     },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    }
 }, { timestamps: true });
 
 const Expense = model('Expense', ExpenseSchema);

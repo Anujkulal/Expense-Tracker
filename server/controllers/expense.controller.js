@@ -7,7 +7,8 @@ exports.addExpense = async (req, res) => {
         amount,
         category,
         description,
-        date
+        date,
+        createdBy: req.user.id,
     })
     
     try{
@@ -27,7 +28,7 @@ exports.addExpense = async (req, res) => {
 
 exports.getExpense = async (req, res) => {
     try{ 
-        const expense = await Expense.find().sort({createdAt: -1});
+        const expense = await Expense.find({ createdBy: req.user.id }).sort({createdAt: -1});
         // console.log(expense.length)
         if(!expense || expense.length === 0){
             return res.status(404).json({error: "No Expense found"})

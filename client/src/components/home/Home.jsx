@@ -1,153 +1,56 @@
-import React from "react";
-import Sidebar from "../sidebar/Sidebar";
-
-// function Home() {
-//   return (
-//     <div className='flex w-full h-screen bg-gray-100'>
-//         <Sidebar/>
-//       <h1>This is a home page</h1>
-//     </div>
-//   )
-// }
-
-// export default Home
-
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import { useState, useEffect, useRef } from "react";
-import { useGlobalContext } from "../../context/GlobalContext";
-
-// const data = [
-//   { name: "Jan", income: 500, expenses: 300 },
-//   { name: "Feb", income: 700, expenses: 400 },
-//   { name: "Mar", income: 800, expenses: 450 },
-//   { name: "Apr", income: 600, expenses: 350 },
-//   { name: "May", income: 900, expenses: 500 },
-// ];
-
-
+import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
-  const { income, expense, getIncome, getExpense, totalIncome, totalExpense, transactionHistory } = useGlobalContext();
+  const author = "Anuj Kulal";
+  
+  const navigate = useNavigate();
 
-  const [...history] = transactionHistory();
-  console.log("Transaction History:::", history);
-  
-
-  const incomeData = income.map((income, index) => {
-    return { date: income.date, income: income.amount };
-  })
-
-  const expensesData = expense.map((expense, index) => {
-    return { date: expense.date, expenses: expense.amount };
-  })
-  // [
-  //   { date: "2024-01-07", expenses: 300 },
-  //   { date: "2024-02-12", expenses: 400 },
-  //   { date: "2024-03-18", expenses: 450 },
-  //   { date: "2024-04-22", expenses: 350 },
-  // ];
-
-  console.log("Income Data:::", incomeData);
-  console.log("Expense Data:::", expensesData);
-  
-  // Merge data while ensuring unique dates and filling missing values
-  const allDates = [...new Set([...incomeData.map(d => d.date), ...expensesData.map(d => d.date)])];
-  
-  // console.log(allDates);
-  
-  const mergedData = allDates.map(date => ({
-    date,
-    income: incomeData.find(d => d.date === date)?.income || null,
-    expenses: expensesData.find(d => d.date === date)?.expenses || null,
-  }));
-  
-  // Sort by date
-  mergedData.sort((a, b) => new Date(a.date) - new Date(b.date));
-  // console.log(mergedData);
-  
-  useEffect(() => {
-    getIncome();
-    getExpense();
-  }, [])
-  
-  // useEffect(()=>{
-  //   console.log("Income:::", income); 
-  //   console.log("Expense:::", expense);
-
-  // },[])
-
+  const handleSignup = () => {
+    navigate("/signup");
+  }
+  const handleSignin = () => {
+    navigate("/signin");
+  }
   return (
-    <div className="flex bg-gray-100">
-      <Sidebar />
-      <div className="w-full flex-1 p-10 flex-col gap-6 bg-black">
-        <div className="flex gap-2 m-6 w-full justify-center">
-          {[
-            { title: "Total Income", value: `₹${totalIncome()}`, color: "text-green-600" },
-            { title: "Total Expenses", value: `₹${totalExpense()}`, color: "text-red-600" },
-            { title: "Total Balance", value: `₹${totalIncome() - totalExpense()}`, color: "text-blue-600" },
-          ].map((box, index) => (
-            <div
-              key={index}
-              className="p-4 m-2 w-1/4 shadow-lg  rounded-lg text-center bg-zinc-800"
-            >
-              <h2 className="text-lg font-semibold text-white">{box.title}</h2>
-              <p className={`text-2xl font-bold ${box.color}`}>{box.value}</p>
-            </div>
-          ))}
-        </div>
+    <div className="bg-zinc-900 text-white min-h-screen">
+      {/* Navbar */}
+      <header className="py-6 px-8 flex justify-between items-center border-b border-zinc-700">
+        <h1 className="text-2xl font-bold">Expense Tracker</h1>
+        <button onClick={handleSignup} className="bg-blue-600 hover:bg-blue-500 px-5 py-2 rounded-md transition duration-300 active:scale-95 cursor-pointer">
+          Get Started
+        </button>
+      </header>
 
-        <div className="w-full flex flex-wrap gap-4 justify-evenly">
-          {/* Graph for Transactions */}
-          <div className="md:w-2/3 w-full min-w-[300px] p-4 shadow-lg  rounded-lg bg-zinc-800 text-white">
-            <h2 className="text-lg  font-semibold mb-2">Transaction Trends</h2>
-            {/* <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="income" stroke="#4CAF50" strokeWidth={2} />
-                <Line type="monotone" dataKey="expenses" stroke="#F44336" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer> */}
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={mergedData}>
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(date) => new Date(date).toLocaleDateString()}
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend /> {/* Add legend */}
-                <Line type="monotone" dataKey="income" stroke="#4CAF50" strokeWidth={2} name="Income" connectNulls />
-                <Line type="monotone" dataKey="expenses" stroke="#F44336" strokeWidth={2} name="Expenses" connectNulls/>
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Hero Section */}
+      <section className="text-center py-20 px-6">
+        <h2 className="text-4xl font-extrabold mb-4">Track Your Expenses Easily</h2>
+        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+          Manage your finances effortlessly with real-time tracking, detailed insights, and a clean, user-friendly interface.
+        </p>
+        <button onClick={handleSignin} className="mt-6 bg-green-600 hover:bg-green-500 transition duration-300 active:scale-95 px-6 py-3 rounded-lg text-lg cursor-pointer">
+          Start Tracking
+        </button>
+      </section>
 
-          {/* Recent Transactions */}
-          <div className="md:w-1/4 w-full min-w-[300px] p-4 shadow-lg  rounded-lg bg-zinc-800 text-white">
-            <h2 className="text-lg font-semibold mb-2">Recent Transactions</h2>
-            <ul>
-              { history.length === 0 ? 
-              <li className="text-center py-2 bg-red-800 p-2 m-4 rounded-xl">No Transactions</li> :
-              history.map((item, index) => (
-                <li key={index} className={`flex justify-between py-2 text-lg`}>
-                  {item.title} <span className={`${item.type === "expense" ? "text-red-600": "text-green-600"}`}> {item.type === "expense" ? "-" : "+"} ₹{item.amount}</span>
-                </li>
-              ))}
-            </ul>
+      {/* Features Section */}
+      <section className="grid md:grid-cols-3 gap-8 px-10 py-16 bg-zinc-800">
+        {[
+          { title: "Real-time Tracking", desc: "Get instant updates on your spending." },
+          { title: "Detailed Reports", desc: "Analyze your expenses with detailed graphs." },
+          { title: "Secure & Private", desc: "Your data is encrypted and secure." }
+        ].map((feature, index) => (
+          <div key={index} className="p-6 border border-zinc-700 rounded-lg text-center">
+            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+            <p className="text-zinc-400">{feature.desc}</p>
           </div>
-        </div>
-      </div>
+        ))}
+      </section>
+
+      {/* Footer */}
+      <footer className="py-6 text-center border-t border-zinc-700">
+        <p className="text-zinc-500">&copy; {author} 2025 Expense Tracker. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
